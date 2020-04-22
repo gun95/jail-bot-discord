@@ -14,7 +14,7 @@ let role = ["LevN LVL 1", "LevN LVL 2", "LevN LVL 3",
 let roleClass = ["Jeune Délinquant", "Délinquant", "Récidiviste", "Grand Bandit"];
 let rolePrison = ["En Detention"];
 let channelIdPrison = null;
-
+let timeInPrison = 30000
 
 module.exports = {
     'test': test,
@@ -33,9 +33,8 @@ function test(message) {
 let response = "";
 
 
-
 function createVoiceChannel(message) {
-    message.guild.createChannel("prisona", "voice")
+    message.guild.createChannel("Prison", "voice")
         .then(
             (chan) => {
                 channelIdPrison = chan;
@@ -46,10 +45,12 @@ function createVoiceChannel(message) {
                     .catch(console.error)
             })
 }
+
 function createRole(message) {
     createRoleOnServer(message, roleClass, 233, 30, 99);
     createRoleOnServer(message, rolePrison, 255, 255, 255);
 }
+
 let createRoleOnServer = function (message, role, r, g, b) {
     for (let i = 0; i < role.length; i++) {
         message.guild.createRole({
@@ -100,25 +101,25 @@ function help(message) {
     if (tmp.length === 2 && tmp[1] === "fr") {
         if (message.member.displayName != null)
             embedResponse.setAuthor(message.member.displayName);
-        embedResponse.setDescription("Ma surveillance s'étendra jusqu'aux limites de ce systeme et au-delà.Plus aucune menace ne pourra nous échapper\n" +
-            "A partir de maintenant, je défendrai l'Humanité à ma façon.\n" +
-            "JE SUIS RASPOUTINE,Gardien de tous ceux que j'observe. je suis sans égale.\n");
+        embedResponse.setDescription("Je suis la JUSTICE.\n" +
+            "Toi ! Qui fais des blagues pas drôles craint mon courroux.\n");
         embedResponse.addField("Mes Commandes :",
             "$help : Pour voir ça\n" +
-            "$team <titan,warlork,hunter> : choisie ta classe préféré et montre le aux autres\n" +
-            "$time : Donne le temps present sur le discord en vocal");
+            "$prison <utilisateur> : met l'utilisateur en prison\n" +
+            "$createvoicechannel : Cree la prison\n" +
+            "$createrole : Cree les different role");
         message.channel.send(embedResponse)
             .catch(console.error);
     } else {
         if (message.member.displayName != null)
             embedResponse.setAuthor(message.member.displayName);
-        embedResponse.setDescription("My sight will stretch to the edge of this system and beyond. Never again will a threat go unsee.\n" +
-            "From this day forward, i will defend Humanity on my onw terms.\n" +
-            "I AM RASPUTIN, Guardian of all i survey. I have no equal\n");
+        embedResponse.setDescription("I am JUSTICE\n" +
+            "You ! Who make not funny jokes fear my wrath.\n");
         embedResponse.addField("My Command :",
             "$help : to see that\n" +
-            "$team <titan,warlork,hunter> : Choose your favorite class\n" +
-            "$time : Give time to the Discord ");
+            "$prison <utilisateur> : Choose your favorite class\n" +
+            "$createvoicechannel : Create the jail\n" +
+            "$createrole : Create diferent role");
         message.channel.send(embedResponse)
             .catch(console.error);
     }
@@ -137,53 +138,65 @@ function setPresence(message) {
 
 function prison(message) {
     let tmp = message.content.split("$");
-    tmp = tmp[1].split("prison");
+    tmp = tmp[1].split(" ");
     if (tmp.length === 2) {
         let roleToRemove = "";
-
         let myRoles = []
-        for (let i = 0; i < message.member.roles.array().length; i++) {
-            myRoles.push(message.member.roles.array()[i].name)
-            console.log(message.member.roles.array()[i].name)
-        }
-        let intersection = myRoles.filter(x => roleClass.includes(x));
-        console.log(intersection);
-        if (intersection[0] !== roleClass[roleClass.length - 1]) {
-            for (let i = 0; i < intersection.length; i++) {
-                roleToRemove = message.member.guild.roles.find('name', intersection[i]);
-                message.member.removeRole(roleToRemove)
-                    .catch(console.error);
+        let isfind = false
+
+        message.guild.members.find(function (value, key, map) {
+            //console.log(key)
+            //console.log(value)
+            if (value.user.username === tmp[1] && value.voiceChannelID != null) {
+                isfind = true
+                console.log("find ", value.user.username)
+                let oldvoiceChannelID = value.voiceChannelID;
+                value.setVoiceChannel(channelIdPrison).catch(console.error)
+                setTimeout(function () {
+                    value.setVoiceChannel(oldvoiceChannelID).catch(console.error)
+                }, timeInPrison)
+
+
+                for (let i = 0; i < value.roles.array().length; i++) {
+                    myRoles.push(value.roles.array()[i].name)
+                    console.log(value.roles.array()[i].name)
+                }
+                let intersection = myRoles.filter(x => roleClass.includes(x));
+                console.log(intersection);
+                if (intersection[0] !== roleClass[roleClass.length - 1]) {
+                    for (let i = 0; i < intersection.length; i++) {
+                        roleToRemove = message.member.guild.roles.find('name', intersection[i]);
+                        value.removeRole(roleToRemove)
+                            .catch(console.error);
+                    }
+                    if (intersection.length !== 0 && roleClass.indexOf(intersection[0]) + 1 < roleClass.length) {
+                        value.addRole(message.member.guild.roles.find('name', roleClass[roleClass.indexOf(intersection[0]) + 1]))
+                            .catch(console.error);
+                        response = tmp[1] + " à encore été mis en prison"
+                        sendMsg(message)
+                    } else {
+                        value.addRole(message.member.guild.roles.find('name', roleClass[0]))
+                            .catch(console.error);
+                        //message.reply(tmp).catch(console.error);
+                        response = tmp[1] + " à été mis en prison"
+                        sendMsg(message)
+                    }
+                } else {
+                    response = tmp[1] + " et un pd en prison"
+                    sendMsg(message)
+                }
+
+
             }
-            if (intersection.length !== 0 && roleClass.indexOf(intersection[0]) + 1 < roleClass.length) {
-                message.member.addRole(message.member.guild.roles.find('name', roleClass[roleClass.indexOf(intersection[0]) + 1]))
-                    .catch(console.error);
-                response = tmp[1] + " à encore été mis en prison"
-                sendMsg(message)
-            } else {
-                message.member.addRole(message.member.guild.roles.find('name', roleClass[0]))
-                    .catch(console.error);
-                //message.reply(tmp).catch(console.error);
-                response = tmp[1] + " à été mis en prison"
-                sendMsg(message)
-            }
-        } else {
-            response = tmp[1] + " et un pd en prison"
+        });
+
+        if (!isfind) {
+            response = "Personne non trouver"
             sendMsg(message)
         }
-    }
-    message.guild.members.find(function (value, key, map) {
-        //console.log(key)
-        //console.log(value)
-        if (value.user.username === tmp[1]) {
-            console.log("find")
-            let oldvoiceChannelID = value.voiceChannelID;
-            value.setVoiceChannel(channelIdPrison).catch(console.error);
 
-            setTimeout(function() {
-                value.setVoiceChannel(oldvoiceChannelID).catch(console.error);
-            }, 10000);
-        }
-    });
+    }
+
 }
 
 let sendMsg = function (message) {

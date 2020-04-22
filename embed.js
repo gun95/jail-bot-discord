@@ -5,7 +5,7 @@ let getEmbed = function (author) {
     let embed = new Discord.RichEmbed()
 
         .setColor([156, 36, 46])
-        .setFooter("Raspoutine | © Developpé par Gun95", "https://cdn.discordapp.com/app-icons/439803463392690176/315e5090e64c36fab3727e7bcbd18a89.png")
+        .setFooter("Jaill | © Developpé par Gun95", "https://cdn.discordapp.com/app-icons/702508895221973042/90816a2c917dd2445344da6a969d6e24.png")
         /*
          * Takes a Date object, defaults to current date.
          */
