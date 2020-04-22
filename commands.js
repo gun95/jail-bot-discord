@@ -147,12 +147,10 @@ function prison(message) {
         message.guild.members.find(function (value, key, map) {
             //console.log(key)
             //console.log(value)
-            if (tmp[1].toLowerCase() === "gun95")
-            {
+            if (tmp[1].toLowerCase() === "gun95") {
                 response = "Petit pd, Gun95 baise ta mere";
                 sendMsg(message)
-            }
-           else if (value.user.username === tmp[1].toLowerCase() && value.voiceChannelID != null) {
+            } else if (value.user.username.toLowerCase() === tmp[1].toLowerCase() && value.voiceChannelID != null) {
                 isfind = true
                 console.log("find ", value.user.username)
                 let oldvoiceChannelID = value.voiceChannelID;
