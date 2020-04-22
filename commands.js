@@ -138,7 +138,7 @@ function setPresence(message) {
 
 function prison(message) {
     let tmp = message.content.split("$");
-    tmp = tmp[1].split(" ");
+    tmp = tmp[1].split("prison ");
     if (tmp.length === 2) {
         let roleToRemove = "";
         let myRoles = []
