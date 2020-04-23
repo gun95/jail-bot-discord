@@ -135,6 +135,7 @@ function setPresence(message) {
     }
 }
 
+let isInPrison = []
 
 function prison(message) {
     let tmp = message.content.split("$");
@@ -148,46 +149,52 @@ function prison(message) {
                 //console.log(key)
                 //console.log(value)
                 if (value.user.username.toLowerCase() === tmp[1].toLowerCase() && value.voiceChannelID != null) {
+                    isfind = true
                     if (tmp[1].toLowerCase() === "gun95") {
                         response = "Petit pd, Gun95 baise ta mere";
                         sendMsg(message)
                     } else {
-
-                        isfind = true
                         console.log("find ", value.user.username)
                         let oldvoiceChannelID = value.voiceChannelID;
-                        value.setVoiceChannel(channelIdPrison).catch(console.error)
-                        setTimeout(function () {
-                            value.setVoiceChannel(oldvoiceChannelID).catch(console.error)
-                        }, timeInPrison)
-
-                        for (let i = 0; i < value.roles.array().length; i++) {
-                            myRoles.push(value.roles.array()[i].name)
-                            console.log(value.roles.array()[i].name)
-                        }
-                        let intersection = myRoles.filter(x => roleClass.includes(x));
-                        console.log(intersection);
-                        if (intersection[0] !== roleClass[roleClass.length - 1]) {
-                            for (let i = 0; i < intersection.length; i++) {
-                                roleToRemove = message.member.guild.roles.find('name', intersection[i]);
-                                value.removeRole(roleToRemove)
-                                    .catch(console.error);
-                            }
-                            if (intersection.length !== 0 && roleClass.indexOf(intersection[0]) + 1 < roleClass.length) {
-                                value.addRole(message.member.guild.roles.find('name', roleClass[roleClass.indexOf(intersection[0]) + 1]))
-                                    .catch(console.error);
-                                response = tmp[1] + " à encore été mis en prison"
-                                sendMsg(message)
-                            } else {
-                                value.addRole(message.member.guild.roles.find('name', roleClass[0]))
-                                    .catch(console.error);
-                                //message.reply(tmp).catch(console.error);
-                                response = tmp[1] + " à été mis en prison"
-                                sendMsg(message)
-                            }
-                        } else {
-                            response = tmp[1] + " est un pd en prison"
+                        if (isInPrison.includes(tmp[1])) {
+                            response = "Petite Pute " + tmp[1] + " est deja en prison"
                             sendMsg(message)
+                        } else {
+                            value.setVoiceChannel(channelIdPrison).catch(console.error)
+                            isInPrison.push(tmp[1])
+                            setTimeout(function () {
+                                value.setVoiceChannel(oldvoiceChannelID).catch(console.error)
+                                isInPrison = isInPrison.filter(e => e !== tmp[1]);
+                            }, timeInPrison)
+
+                            for (let i = 0; i < value.roles.array().length; i++) {
+                                myRoles.push(value.roles.array()[i].name)
+                                console.log(value.roles.array()[i].name)
+                            }
+                            let intersection = myRoles.filter(x => roleClass.includes(x));
+                            console.log(intersection);
+                            if (intersection[0] !== roleClass[roleClass.length - 1]) {
+                                for (let i = 0; i < intersection.length; i++) {
+                                    roleToRemove = message.member.guild.roles.find('name', intersection[i]);
+                                    value.removeRole(roleToRemove)
+                                        .catch(console.error);
+                                }
+                                if (intersection.length !== 0 && roleClass.indexOf(intersection[0]) + 1 < roleClass.length) {
+                                    value.addRole(message.member.guild.roles.find('name', roleClass[roleClass.indexOf(intersection[0]) + 1]))
+                                        .catch(console.error);
+                                    response = tmp[1] + " à encore été mis en prison"
+                                    sendMsg(message)
+                                } else {
+                                    value.addRole(message.member.guild.roles.find('name', roleClass[0]))
+                                        .catch(console.error);
+                                    //message.reply(tmp).catch(console.error);
+                                    response = tmp[1] + " à été mis en prison"
+                                    sendMsg(message)
+                                }
+                            } else {
+                                response = tmp[1] + " est un pd en prison"
+                                sendMsg(message)
+                            }
                         }
                     }
                 }

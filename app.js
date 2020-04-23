@@ -48,7 +48,7 @@ const botPrefix = '$';
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
-    client.user.setPresence({game: {name: 'Torturer DrL4CO'}, status: 'online'})
+    client.user.setPresence({game: {name: 'Je baise ta mère'}, status: 'online'})
         .catch(console.error);
 });
 
