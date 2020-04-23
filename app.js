@@ -73,7 +73,7 @@ function getCmdFunction(cmd) {
     };
 }
 
-client.login("");
+client.login(process.env.tokenJaill);
 
 
 let setPresence = function (title) {
